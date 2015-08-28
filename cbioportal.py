@@ -50,10 +50,12 @@ def get_multi_gene(case_set_id, genetic_profile_id, genes):
     r = requests.get('%sgetProfileData&case_set_id=%s&genetic_profile_id=%s&gene_list=%s' %
                      (base_url, case_set_id, genetic_profile_id, gene_list))
     results = r.text.split('\n')
-    clean_results = []
+    clean_results = list()
     for result in results:
         if result.startswith('#'):
-            pass
+            continue
+        elif not result.strip():
+            continue
         else:
             clean_results.append(result)
 
