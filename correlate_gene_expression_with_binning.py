@@ -1,8 +1,10 @@
-__author__ = 'dgaston'
+#!/usr/bin/env python
 
 import argparse
 import csv
+import sys
 import itertools
+import numpy as np
 import scipy.stats
 
 import cbioportal
@@ -23,7 +25,11 @@ if __name__ == "__main__":
     prime_gene = genes.pop(0)
 
     with open(args.output, 'w') as outfile:
-        outfile.write("Study\tCase List\tProfile\tGenes\tNumbers\tSpearman's Rho\tP-Value\n")
+        outfile.write("Study\tCase List\tProfile\tGenes\t"
+                      "Bin1 #\tBin1 R\tBin1 p\t"
+                      "Bin2 #\tBin2 R\tBin2 p\t"
+                      "Bin3 #\tBin3 R\tBin3 p\t"
+                      "Bin4 #\tBin4 R\tBin4 p\n")
         with open(args.cases, 'rU') as casefile:
             reader = csv.reader(casefile, dialect='excel-tab')
             reader.next()
@@ -41,30 +47,81 @@ if __name__ == "__main__":
                     data.pop(0)
                     gene = data.pop(0)
                     if gene == prime_gene:
-                        primary_data = data
+                        for e in data:
+                            if e != 'NaN':
+                                primary_data.append(float(e))
                         profile_data.pop(i)
                         break
                     i += 1
 
                 # Analyse the expression distribution of the control gene and assign samples to expression bins
+                sorted_primary = sorted(primary_data)
+                lower = np.percentile(sorted_primary, 25)
+                mid = np.percentile(sorted_primary, 50)
+                upper = np.percentile(sorted_primary, 75)
+
+                sys.stdout.write("For gene {gene} the 25th percentile is {low}, the median is {med}, and the 75th"
+                                 "percentile is {up}\n".format(gene=prime_gene, low=lower, med=mid, up=upper))
 
                 for data_line in profile_data:
                     data = data_line.split()
 
-                    # Remove Gene ID and gene gene name
+                    # Remove Gene ID and gene name
                     data.pop(0)
-                    gene1 = data.pop(0)
+                    comp_gene = data.pop(0)
 
-                    expression1 = list()
-                    expression2 = list()
+                    expression1_1 = list()
+                    expression2_1 = list()
 
-                    for values in itertools.izip(data1, data2):
+                    expression1_2 = list()
+                    expression2_2 = list()
+
+                    expression1_3 = list()
+                    expression2_3 = list()
+
+                    expression1_4 = list()
+                    expression2_4 = list()
+
+                    for values in itertools.izip(primary_data, data):
                         if values[0] != 'NaN' and values[1] != 'NaN':
-                            expression1.append(float(values[0]))
-                            expression2.append(float(values[1]))
+                            if values[0] < lower:
+                                expression1_1.append(float(values[0]))
+                                expression2_1.append(float(values[1]))
+                            elif lower <= values[0] < mid:
+                                expression1_2.append(float(values[0]))
+                                expression2_2.append(float(values[1]))
+                            elif mid <= values[0] < upper:
+                                expression1_3.append(float(values[0]))
+                                expression2_3.append(float(values[1]))
+                            elif values[0] >= upper:
+                                expression1_4.append(float(values[0]))
+                                expression2_4.append(float(values[1]))
+                            else:
+                                sys.stderr.write("ERROR: Value {val} did not fit within binned "
+                                                 "quartiles\n".format(val=values[0]))
 
-                    if len(expression1) > 0 and len(expression2) > 0:
-                        rho, pvalue = scipy.stats.spearmanr(expression1, expression2)
-                        outfile.write("%s\t%s\t%s\t%s - %s\t%s, %s\t%s\t%s\n" %
-                                      (row[0], row[1], row[2], gene1, gene2, len(expression1), len(expression2),
-                                       rho, pvalue))
+                    outfile.write("{s}\t{c}\t{p}\t{g1} - {g2}\t".format(s=row[0], c=row[1], p=row[2],
+                                                                        g1=prime_gene, g2=comp_gene))
+                    if len(expression1_1) > 0 and len(expression2_1) > 0:
+                        rho, pvalue = scipy.stats.spearmanr(expression1_1, expression2_1)
+                        outfile.write("{}, {}\t{}\t{}\t".format(len(expression1_1), len(expression2_1), rho, pvalue))
+                    else:
+                        outfile.write("0, 0\tn/a\tn/a\t")
+
+                    if len(expression1_2) > 0 and len(expression2_2) > 0:
+                        rho, pvalue = scipy.stats.spearmanr(expression1_2, expression2_2)
+                        outfile.write("{}, {}\t{}\t{}\t".format(len(expression1_2), len(expression2_2), rho, pvalue))
+                    else:
+                        outfile.write("0, 0\tn/a\tn/a\t")
+
+                    if len(expression1_3) > 0 and len(expression2_3) > 0:
+                        rho, pvalue = scipy.stats.spearmanr(expression1_3, expression2_3)
+                        outfile.write("{}, {}\t{}\t{}\t".format(len(expression1_3), len(expression2_3), rho, pvalue))
+                    else:
+                        outfile.write("0, 0\tn/a\tn/a\t")
+
+                    if len(expression1_4) > 0 and len(expression2_4) > 0:
+                        rho, pvalue = scipy.stats.spearmanr(expression1_4, expression2_4)
+                        outfile.write("{}, {}\t{}\t{}\t".format(len(expression1_4), len(expression2_4), rho, pvalue))
+                    else:
+                        outfile.write("0, 0\tn/a\tn/a\n")
