@@ -22,7 +22,7 @@ if __name__ == "__main__":
     with open(args.genes, 'rU') as genefile:
         genes = genefile.read().splitlines()
 
-    prime_gene = genes.pop(0)
+    prime_gene = genes[0]
 
     with open(args.output, 'w') as outfile:
         outfile.write("Study\tCase List\tProfile\tGenes\t"
@@ -34,14 +34,23 @@ if __name__ == "__main__":
             reader = csv.reader(casefile, dialect='excel-tab')
             reader.next()
             for row in reader:
+                if row[0].startswith("#"):
+                    sys.stderr.write("WARNING: Skipping commented input line\n")
+                    continue
+
                 profile_data = cbioportal.get_multi_gene(row[1], row[2], genes)
                 header = profile_data.pop(0)
+
+                if len(profile_data) <= 0:
+                    sys.stderr.write("ERROR: No data retrieved for query, with response header: {}\n".format(header))
+                    continue
 
                 # Because gene expression data is returned in alphabetical order we have to find the line
                 # containing our control gene data line, remove it from the data_lines, and isolated it for comparisons
                 primary_data = list()
                 i = 0
                 for line in profile_data:
+                    # print line
                     data = line.split()
                     # Remove Gene ID
                     data.pop(0)
@@ -54,8 +63,12 @@ if __name__ == "__main__":
                         break
                     i += 1
 
+                if len(primary_data) <= 0:
+                    sys.stderr.write("WARNING: No Expression values for data set. Skipping\n")
+                    continue
+
                 # Analyse the expression distribution of the control gene and assign samples to expression bins
-                sorted_primary = sorted(primary_data)
+                sorted_primary = np.asarray(sorted(primary_data))
                 lower = np.percentile(sorted_primary, 25)
                 mid = np.percentile(sorted_primary, 50)
                 upper = np.percentile(sorted_primary, 75)
@@ -122,6 +135,6 @@ if __name__ == "__main__":
 
                     if len(expression1_4) > 0 and len(expression2_4) > 0:
                         rho, pvalue = scipy.stats.spearmanr(expression1_4, expression2_4)
-                        outfile.write("{}, {}\t{}\t{}\t".format(len(expression1_4), len(expression2_4), rho, pvalue))
+                        outfile.write("{}, {}\t{}\t{}\n".format(len(expression1_4), len(expression2_4), rho, pvalue))
                     else:
                         outfile.write("0, 0\tn/a\tn/a\n")
