@@ -1,30 +1,34 @@
-__author__ = 'dan'
 import requests
 import sys
+
 base_url = 'http://www.cbioportal.org/webservice.do?cmd='
 
 
 def get_cancer_types():
     r = requests.get('%sgetTypesOfCancer' % base_url)
     types = r.text.split('\n')
+
     return types
 
 
 def get_cancer_studies():
     r = requests.get('%sgetTypesOfCancer' % base_url)
     studies = r.text.split('\n')
+
     return studies
 
 
 def get_genetic_profiles(study_id):
     r = requests.get('%sgetGeneticProfiles&cancer_study_id=%s' % (base_url, study_id))
     profiles = r.text.split('\n')
+
     return profiles
 
 
 def get_case_list(study_id):
     r = requests.get('%sgetCaseLists&cancer_study_id=%s' % (base_url, study_id))
     results = r.text.split('\n')
+
     return results
 
 
@@ -60,4 +64,11 @@ def get_multi_gene(case_set_id, genetic_profile_id, genes):
             clean_results.append(result)
 
     return clean_results
+
+
+def get_clin_data(case_set_id):
+    r = requests.get('%getClinicalData&case_set_id=%s' % (base_url, case_set_id))
+    results = r.text.split('\n')
+
+    return results
 
