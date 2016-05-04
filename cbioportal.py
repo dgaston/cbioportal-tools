@@ -67,7 +67,7 @@ def get_multi_gene(case_set_id, genetic_profile_id, genes):
 
 
 def get_clin_data(case_set_id):
-    r = requests.get('%getClinicalData&case_set_id=%s' % (base_url, case_set_id))
+    r = requests.get('%sgetClinicalData&case_set_id=%s' % (base_url, case_set_id))
     results = r.text.split('\n')
 
     return results
