@@ -41,26 +41,28 @@ if __name__ == "__main__":
 
             for d, a in itertools.izip(data[gene], data['Age']):
                 if int(a) <= 55:
-                    age_bin1.append(a)
+                    age_bin1.append(d)
                 if 55 < int(a) <= 65:
-                    age_bin2.append(a)
+                    age_bin2.append(d)
                 if 65 < int(a) <= 75:
-                    age_bin3.append(a)
+                    age_bin3.append(d)
                 if 75 < int(a) <= 55:
-                    age_bin4.append(a)
+                    age_bin4.append(d)
                 if int(a) > 85:
-                    age_bin5.append(a)
+                    age_bin5.append(d)
 
-            trace1 = go.Box(y=cna_neg2,
-                            name="Deep Deletion")
-            trace2 = go.Box(y=cna_neg1,
-                            name="Hemizygous Deletion")
-            trace3 = go.Box(y=cna_zero,
-                            name="Neutral")
-            trace4 = go.Box(y=cna_pos1,
-                            name="Amplification")
+            trace1 = go.Box(y=age_bin1,
+                            name="Under 55")
+            trace2 = go.Box(y=age_bin2,
+                            name="55-65")
+            trace3 = go.Box(y=age_bin3,
+                            name="65-75")
+            trace4 = go.Box(y=age_bin4,
+                            name="75-85")
+            trace5 = go.Box(y=age_bin5,
+                            name="Over 85")
 
-            traces = [trace1, trace2, trace3, trace4]
+            traces = [trace1, trace2, trace3, trace4, trace5]
 
             layout = go.Layout(title="CNA Value By Age for Gene: {}".format(gene),
                                xaxis=dict(
