@@ -32,11 +32,11 @@ if __name__ == "__main__":
     traces = list()
     for gene in data:
         if gene != 'Age':
-            count_bin1 = 0
-            count_bin2 = 0
-            count_bin3 = 0
-            count_bin4 = 0
-            count_bin5 = 0
+            count_bin1 = 0.0000001
+            count_bin2 = 0.0000001
+            count_bin3 = 0.0000001
+            count_bin4 = 0.0000001
+            count_bin5 = 0.0000001
 
             num_neg2_bin1 = 0
             num_neg1_bin1 = 0
@@ -111,7 +111,7 @@ if __name__ == "__main__":
                     elif int(d) == 2:
                         num_pos2_bin3 += 1
 
-                if 75 < int(a) <= 55:
+                if 75 < int(a) <= 85:
                     count_bin4 += 1
 
                     if int(d) == -2:
@@ -139,45 +139,45 @@ if __name__ == "__main__":
                     elif int(d) == 2:
                         num_pos2_bin5 += 1
 
-            trace1 = go.Bar(x=['-2', '-1', '0', '+1', '+2'],
-                            y=[float(num_neg2_bin1) / float(count_bin1),
-                               float(num_neg1_bin1) / float(count_bin1),
-                               float(num_zero_bin1) / float(count_bin1),
-                               float(num_pos1_bin1) / float(count_bin1),
-                               float(num_pos2_bin1) / float(count_bin1)],
-                            name="Under 55")
+            trace1 = go.Bar(x=['Under 55', '55-65', '65-75', '75-85', '85 and Over'],
+                            y=[num_neg2_bin1 / count_bin1,
+                               num_neg2_bin2 / count_bin2,
+                               num_neg2_bin3 / count_bin3,
+                               num_neg2_bin4 / count_bin4,
+                               num_neg2_bin5 / count_bin5],
+                            name="Deep Loss")
 
-            trace2 = go.Bar(x=['-2', '-1', '0', '+1', '+2'],
-                            y=[float(num_neg2_bin2) / float(count_bin2),
-                               float(num_neg1_bin2) / float(count_bin2),
-                               float(num_zero_bin2) / float(count_bin2),
-                               float(num_pos1_bin2) / float(count_bin2),
-                               float(num_pos2_bin2) / float(count_bin2)],
-                            name="55-65")
+            trace2 = go.Bar(x=['Under 55', '55-65', '65-75', '75-85', '85 and Over'],
+                            y=[num_neg1_bin1 / count_bin1,
+                               num_neg1_bin2 / count_bin2,
+                               num_neg1_bin3 / count_bin3,
+                               num_neg1_bin4 / count_bin4,
+                               num_neg1_bin5 / count_bin5],
+                            name="Shallow Loss")
 
-            trace3 = go.Bar(x=['-2', '-1', '0', '+1', '+2'],
-                            y=[float(num_neg2_bin3) / float(count_bin3),
-                               float(num_neg1_bin3) / float(count_bin3),
-                               float(num_zero_bin3) / float(count_bin3),
-                               float(num_pos1_bin3) / float(count_bin3),
-                               float(num_pos2_bin3) / float(count_bin3)],
-                            name="65-75")
+            trace3 = go.Bar(x=['Under 55', '55-65', '65-75', '75-85', '85 and Over'],
+                            y=[num_zero_bin1 / count_bin1,
+                               num_zero_bin2 / count_bin2,
+                               num_zero_bin3 / count_bin3,
+                               num_zero_bin4 / count_bin4,
+                               num_zero_bin5 / count_bin5],
+                            name="Copy Neutral")
 
-            trace4 = go.Bar(x=['-2', '-1', '0', '+1', '+2'],
-                            y=[float(num_neg2_bin4) / float(count_bin4),
-                               float(num_neg1_bin4) / float(count_bin4),
-                               float(num_zero_bin4) / float(count_bin4),
-                               float(num_pos1_bin4) / float(count_bin4),
-                               float(num_pos2_bin4) / float(count_bin4)],
-                            name="75-85")
+            trace4 = go.Bar(x=['Under 55', '55-65', '65-75', '75-85', '85 and Over'],
+                            y=[num_pos1_bin1 / count_bin1,
+                               num_pos1_bin2 / count_bin2,
+                               num_pos1_bin3 / count_bin3,
+                               num_pos1_bin4 / count_bin4,
+                               num_pos1_bin5 / count_bin5],
+                            name="Gain")
 
-            trace5 = go.Bar(x=['-2', '-1', '0', '+1', '+2'],
-                            y=[float(num_neg2_bin5) / float(count_bin5),
-                               float(num_neg1_bin5) / float(count_bin5),
-                               float(num_zero_bin5) / float(count_bin5),
-                               float(num_pos1_bin5) / float(count_bin5),
-                               float(num_pos2_bin5) / float(count_bin5)],
-                            name="Over 85")
+            trace5 = go.Bar(x=['Under 55', '55-65', '65-75', '75-85', '85 and Over'],
+                            y=[num_pos2_bin1 / count_bin1,
+                               num_pos2_bin2 / count_bin2,
+                               num_pos2_bin3 / count_bin3,
+                               num_pos2_bin4 / count_bin4,
+                               num_pos2_bin5 / count_bin5],
+                            name="Strong Gain")
 
             traces = [trace1, trace2, trace3, trace4, trace5]
 
